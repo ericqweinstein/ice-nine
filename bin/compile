@@ -1,0 +1,25 @@
+#!/bin/sh
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+ENV_DIR=$3
+CRYSTAL_URL="https://github.com/manastech/crystal/releases/download/0.9.1/crystal-0.9.1-1-linux-x86_64.tar.gz"
+CRYSTAL_DIR=/tmp/crystal
+SHARDS_DIR=/tmp/shards
+unset GIT_DIR
+
+# Install Crystal
+echo "-----> Installing Crystal"
+mkdir -p $CRYSTAL_DIR
+curl -sL $CRYSTAL_URL | tar xz -C $CRYSTAL_DIR --strip-component=1
+
+# Build the project
+cd $BUILD_DIR
+
+if [ -f shard.yml ]; then
+  echo "-----> Installing dependencies"
+  $SHARDS_DIR install
+fi
+
+echo "-----> Compiling app.cr"
+$CRYSTAL_DIR/bin/crystal build app.cr --release
